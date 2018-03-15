@@ -9,7 +9,7 @@ Welkom bij de cursus. Hij is opgezet om zelfstandig te doen, maar voor vragen ku
 Dit is een stap voor stap cursus waarbij je aan het eind dit kunt:
 - Je ontwikkelomgeving opzetten
 - React componenten bouwen
-- De React kernconcepten kennen (state / props / shadow-DOM / life cycle)
+- De React kernconcepten kennen (state / props / virtual-DOM / life cycle)
 - Unidirectional flow of data integreren in je app (gebruikmakend van redux en redux-thunk)
 - Ajax (xhr) integreren in je app
 - Routing met de history package (wrapper voor browser history API)
@@ -33,7 +33,7 @@ Het antwoord is nee: een package.json is geen pom.xml. En ja: het is een depency
 ### [Les 2](https://rel-git-p100.wpakb.kb.nl/RAR020/react-workshop/tree/master/lesson2): mijn eerste React component
 
 Dit is als het klopt wel cool, maar nog niet genoeg om een framework te noemen. Verrassing: React is _geen_ framework, maar een library met:
-- een 'shadow-DOM'
+- een 'virtual-DOM'
 - een fancy XML-syntax genaamd JSX
 - een component life cycle op basis van veranderingen in state en props
 
@@ -53,3 +53,7 @@ En eindelijk is het _framework_ compleet, nu je kunt praten met een backend en d
 ### [Les 5](https://rel-git-p100.wpakb.kb.nl/RAR020/react-workshop/tree/master/lesson5): Redux first Routing
 
 Ja. Google maar rond. Er is géén mooie out-of-the-box plugin hiervoor. Daarom doen we dit nog maar even zelf. Als je jezelf koppijn wilt opleveren probeer gerust ```react-router```, maar het routen _hoeft_ echt niet ingewikkeld te zijn -> als je maar zorgt dat redux de baas is over de state van je applicatie.
+
+### [Les 6](https://rel-git-p100.wpakb.kb.nl/RAR020/react-workshop/tree/master/lesson6): Oh ja, testen
+
+Ik houd het hier kort, maar testen kan een stevig onderdeel zijn van je ontwikkelwerk, afhankelijk van de use case.
