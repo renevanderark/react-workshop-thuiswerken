@@ -80,17 +80,25 @@ En _kun_ je nu dit op een tamelijk uitgekristalliseerde/nette manier conform een
 ## Dat is een hoop introductie. We zouden toch dingen gaan doen?
 
 Mijn hoop is dat de procentjes hierboven je gaan helpen feeling te krijgen met wat voor soort code we allemaal nog moeten gaan schrijven. Ik ga dat nu voor je uitsplitsen per subonderdeel
+
 ### Actions
+
 - we moeten alle acties die onze app wil uitvoeren zelf bouwen, gebruik makend van de ```dispatch``` (en ```getState```) functie(s) van redux
 - we moeten alle acties aanbieden als props aan de App via een functie die we een 'action creator' noemen
 - we moeten ActionTypes definiëren
+
 ### Dispatcher
+
 - We moeten de functie ```dispatch``` aan onze actions geven via de 'action creator'
+
 ### Store
+
 - We moeten zogenaamde 'reducers' bouwen die elk hun eigen (immutable) datablokje beheren...
 - ...door per ActionType berichten van de dispatcher te ontvangen...
 - en op een zinvolle wijze op te slaan in dat datablokje (de app state, je single source of truth!)
+
 ### View
+
 - We moeten zorgen dat gebruikershandelingen zo veel mogelijk via de actions uit de action creator verlopen
 - ...via de props
 - We moeten een <Provider> om onze app heen hangen, die ervoor zorgt dat de state uit de store wordt doorgesluisd naar de component tree
