@@ -33,6 +33,8 @@ Belangrijk zijn die dikke grijze pijlen. Die wijzen maar één richting uit, het
 2. Dispatcher (0%)
 3. Store (0%)
 4. View (50%)
+
+Wat hebben we dan al gedaan?
 - De views luisteren al naar change events, dat doet een React component namelijk by design.
 - Maar we hebben nog geen 'store' om data uit te halen
 - En we voeden wél de kindernodes (via props)
