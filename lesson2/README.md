@@ -224,23 +224,15 @@ const Header = (props) => (
 export default Header;
 ```
 Deze code demonstreert wat kleine features.
+
 Sinds React 0.14 kun je [stateless functional components](https://hackernoon.com/react-stateless-functional-components-nine-wins-you-might-have-overlooked-997b0d933dbc) doen; het wordt aangemoedigd.
+
 Inline styles. Deze kun je meegeven als plain (camelCased) javascript objecten. Mijn voorkeur heeft nog steeds css via stylesheets, maar in React-land schijnen de meningen hierover verdeeld te zijn. Zoals je ziet staan er nu dubbele curlies om die styles heen. De eerste nesting is gewoon de instructie aan jsx om dit te behandelen als een variabele (voor een _prop_ genaamd ```style``` welteverstaan).
 
 Ik heb ook maar een extra prop meegegeven genaamd ```versie```. In jsx worden props dus meegegeven met de syntax van een XML attribuut. Als het een constante string-waarde is gebruiken we dubbele quotes, anders altijd curlies.
 
-Je kunt het trouwens nog extremer doen met object destructuring in de parameterlijst van de functie (dan zie je het hele argument genaamd props niet meer), maar voor de vorm toon ik nog een kortere versie hiervan:
-Header.js (niet meer zo zelfdocumenterend)
-```javascript
-import React from "react";
+Er is een hoop mogelijk met _props_, wat erg populair is, is [PropType validatie](https://reactjs.org/docs/typechecking-with-proptypes.html). Dit is geen onderdeel van de cursus, maar wordt wel aangemoedigd.
 
-export default ({ versie, children}) => (
-  <div className="header">
-    <span style={{float: "right", color: "#aaa"}}>versie {versie}</span>
-    <h1 style={{width: "calc(100% - 250px)"}}>{children}</h1>
-  </div>
-);
-```
 
 NewTask.js
 ```javascript
@@ -385,7 +377,8 @@ export default App;
 
 Zo. Genoeg over css.
 
-## Dat is leuk, maar het _doet_ niets! Props en state
+## Dat is leuk, maar het _doet_ niets! - Props en state.
+
 Ja, javascript is natuurlijk niet één of andere render-engine voor jsx.
 
 We gaan nu een klein beetje dynamiek introduceren met behulp van _state_ en _props_ in het formulier voor nieuwe taak aanmaken.
@@ -476,19 +469,19 @@ export default InputField;
 
 Hier zie je weer wat nieuwe dingen:
 - Een override op de constructor
-- Waardes die uitgelezen worden uit ```this.state``` naast ```this.props```
+- Waardes die uitgelezen worden uit ```this.state``` naast ```this.props``` in ```render()```
 
-De props zijn doorgegeven door het parent component en worden behandeld als constante waarde binnen de scope van dit component. Je _mag_ er dan ook niet aankomen van React.
+De props zijn doorgegeven door het parent component en worden behandeld als constante waarde binnen de scope van dit component. Je _mag_ er dan ook niet aankomen van React; je _moet_ ze ook aan de ```super``` meegeven in een constructor.
 
-De state wordt gedeclareerd binnen de scope van dit component en dit component is zelf de baas over zijn state. Dus waar ```isValid``` een _prop_ is voor het component ValidBox is het een _state_ voor het component InputField. We laten straks InputField bepalen of iets _valid_ is.
+De state wordt gedeclareerd binnen de scope van dit component in de constructor. Dit component is zelf de baas over zijn state. Dus waar ```isValid``` een _prop_ is voor het component ValidBox is het een _state_ voor het component InputField. We laten straks InputField bepalen of iets _valid_ is.
 
 Als je de nieuwe versie van je app bekijkt in de browser en iets probeert in te voeren in je input veld gebeurt er niks. React is nu de baas van je events en React wil dat je ```onChange``` de _state_ verandert.
 
-## Dat is leuk, maar het doet _nog steeds_ niets! Props en state manipulatie
+## Dat is leuk, maar het doet _nog steeds_ niets! - Props en state manipulatie.
 
 Het aanpassen van de _state_ van een component MOET met de Component method ```setState```.
 
-Want het aanpassen van eender welke waarde dan ook, of het nu een _prop_ is of een _state_ triggert een rerender van de hele boom (vanaf het component waarin de state change plaatsvindt). Zoals je heel snel gaat zien (in Deel 3) wordt een App in zijn geheel _vaak_ gererendered. Er zijn meerdere mechanismen om de hoeveelheid rerenders te onderdrukken, waaronder de (beetje gevaarlijke) lifecycle methode ```shouldComponentUpdate```.
+Want het aanpassen van eender welke waarde dan ook, of het nu een _prop_ is of een _state_ triggert een rerender van de hele boom (vanaf het component waarin de state change plaatsvindt). Zoals je heel snel gaat zien (in Deel 3) wordt een App in zijn geheel _vaak_ gererendered. Er zijn meerdere mechanismen om de hoeveelheid rerenders te onderdrukken, waaronder de (PREMATURE OPTIMIZATION!!) lifecycle methode ```shouldComponentUpdate```.
 
 LET OP: Lees [hier](https://reactjs.org/docs/react-component.html) meer over de Component lifecycle methodes.
 
@@ -561,7 +554,11 @@ Als je iets corrects intypt wordt nu het kruisje in de ValidBox een vinkje. Totd
 
 ## Recap
 
-Je hebt nu het nodige gedaan met React. Eigenlijk heb je zo'n beetje kennisgemaakt met héél React. Maar dan doemen er vragen op:
+Je hebt nu het nodige gedaan met React. Eigenlijk heb je zo'n beetje kennisgemaakt met héél React. Belangrijk om te onthouden is:
+- Wat is een _state_ en wat is een _prop_ en vanaf wanneer wordt een _state_ een _prop_? (dat staat hierboven)
+- Components hebben een [lifecycle](https://reactjs.org/docs/react-component.html)
+
+Maar dan doemen er vragen op:
 - Er is een Ok knop in de parent van de InputFields. Hoe weet ik nu of de invoer valide was zodat ik de knop kan enablen/disablen?
 - Als ik een taak toevoeg, hoe vertel ik nou aan het te maken TaskOverview component welke taken er zijn aangemaakt?
 - Hoe laat ik de Ok knop eigenlijk een taak toevoegen?
