@@ -101,7 +101,7 @@ Mijn hoop is dat de procentjes hierboven je gaan helpen feeling te krijgen met w
 
 - We moeten zorgen dat gebruikershandelingen zo veel mogelijk via de actions uit de action creator verlopen
 - ...via de props
-- We moeten een <Provider> om onze app heen hangen, die ervoor zorgt dat de state uit de store wordt doorgesluisd naar de component tree
+- We moeten een Provider om onze app heen hangen, die ervoor zorgt dat de state uit de store wordt doorgesluisd naar de component tree
 - We _mogen_ connectors bouwen die als trechter fungeren om top-level componenten heen (zodat niet alles de hele tijd gererendered hoeft te worden)
 
 Volgens mij is dat alles, we gaan aan de slag.
