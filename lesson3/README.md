@@ -126,9 +126,8 @@ import ActionTypes from "../action-types";
 
 const initialState = {
   taskUnderEdit: {
-    taskName: "",
-    contactEmail: "",
-    isValid: false,
+    taskName: {value: "", isValid: false},
+    contactEmail: {value: "", isValid: false},
     id: null
   }
 };
@@ -259,9 +258,102 @@ De functie ```connect``` is een higher order function. Hij geeft een functie ter
 
 TaskOverview.js
 ```javascript
+import React from "react";
+import { connect } from "react-redux";
 
+class TaskOverview extends React.Component {
+
+  render() {
+    return (
+      <div className="card">
+        <div className="card-header">Takenoverzicht</div>
+        <div className="card-body">
+          <pre>{JSON.stringify(this.props, null, 2)}</pre>
+        </div>
+      </div>
+    );
+  }
+}
+export default connect((state) => state.taskOverview)(TaskOverview);
 ```
 
+Nu gaan we zorgen dat de _props_ uit de store op de juiste plek in de app belanden. Dit doen we door ze door te geven via de props-attributen van ```jsx```.
+
+NewTask.js
+```javascript
+import React from "react";
+import {connect} from "react-redux";
+import TaskForm from "./TaskForm";
+
+const NewTask = (props) => (
+  <div className="card">
+    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-body">
+      <pre>{JSON.stringify(props, null, 2)}</pre>
+      <TaskForm taskUnderEdit={props.taskUnderEdit} />
+    </div>
+  </div>
+);
+
+export default connect((state) => state.taskManagement)(NewTask);
+```
+
+TaskForm.js
+```javascript
+import React from "react";
+import InputField from "../form-util/InputField";
+
+const TaskForm = (props) => {
+  const {taskUnderEdit: { taskName, contactEmail }} = props;
+  const allowedToSave = taskName.isValid && contactEmail.isValid;
+  return (
+    <div>
+      <InputField label="Taaknaam" field={props.taskUnderEdit.taskName} />
+      <InputField label="Contact email" field={props.taskUnderEdit.contactEmail} />
+      <button disabled={!allowedToSave} className="btn btn-default">
+        Ok
+      </button>
+    </div>
+  );
+}
+
+export default TaskForm;
+```
+
+InputField.js
+```javascript
+import React from "react";
+import ValidBox from "./ValidBox";
+
+class InputField extends React.Component {
+  onValueChange(ev) {
+    console.log(`TODO: action aanroepen met: ${ev.target.value}`)
+  }
+
+
+  render() {
+    const { field: {isValid, value}, label } = this.props;
+    return (
+      <div className="form-row row">
+        <label className="col-md-2">{label}</label>
+        <div className="input-group col-md-10">
+          <ValidBox isValid={isValid} />
+          <input onChange={this.onValueChange.bind(this)} type="text" className="form-control" value={value} />
+        </div>
+      </div>
+    );
+  }
+}
+export default InputField;
+```
+
+Wacht eens even. Wat is er gebeurd met de constructor? Met setState? Zijn we weer terug bij af?
+
+Ja. We gaan straks actions bouwen. Redux wordt de baas van dit formulier. Waarom? Waarom moet dat rondje van grijze pijlen in dat plaatje hierboven de hele tijd worden afgewandeld? Dat is toch allemaal performance overhead?
+
+Alle _state_ in je componenten die invloed heeft op de rest van de applicatie hoort thuis in de centrale store. Omdat dit vrijwel altijd het geval is, is het het veiligst om ook alle state van alle componenten via de actions/dispatcher te laten updaten in je centrale store. Het maakt de indeling van je code overzichtelijker en je applicatie makkelijker te debuggen (je weet immers waar de data staan (reducers) en waar de logische operaties plaatsvinden (actions)).
+
+Gebruik ```setState``` spaarzaam, wanneer de state echt alleen bij het component hoort (visuele effectjes bijvoorbeeld), of wanneer performance echt een rol blijkt te spelen (frequentie van rerenders). Maar zelfs dan kun je eerst nog kijken naar de lifecycle method (PREMATURE OPTIMIZATION) ```shouldComponentUpdate```.
 
 ## Je Actions - de data manipulaties
 
