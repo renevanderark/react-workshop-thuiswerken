@@ -406,26 +406,164 @@ Om onze nieuwe action volledig te integreren met de rest van de app moeten we we
 
 index.js
 ```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore, combineReducers } from 'redux';
+import { Provider } from "react-redux";
+
+import taskManagementReducer from "./store/task-management";
+import taskOverviewReducer from "./store/task-overview";
+
+import actionCreator from "./actions";
+
+import App from "./components/App";
+import Header from "./components/layout/Header";
+import NewTask from "./components/task-management/NewTask";
+import TaskOverview from "./components/task-overview/TaskOverview";
+
+const store = createStore(combineReducers({
+  taskManagement: taskManagementReducer,
+  taskOverview: taskOverviewReducer
+}));
+
+const {
+  onTaskUnderEditChange
+} = actionCreator(store.dispatch);
+
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.2">Takenbeheer</Header>
+        <NewTask onTaskUnderEditChange={onTaskUnderEditChange} />
+        <TaskOverview />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
 ```
 
 NewTask.js
 ```javascript
+import React from "react";
+import {connect} from "react-redux";
+import TaskForm from "./TaskForm";
+
+const NewTask = (props) => (
+  <div className="card">
+    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-body">
+      <TaskForm onTaskUnderEditChange={props.onTaskUnderEditChange}
+                taskUnderEdit={props.taskUnderEdit} />
+    </div>
+  </div>
+);
+
+export default connect((state) => state.taskManagement)(NewTask);
 ```
 
 TaskForm.js
 ```javascript
+import React from "react";
+import InputField from "../form-util/InputField";
+
+class TaskForm extends React.Component {
+
+  onTaskNameChange(newValue) {
+    this.props.onTaskUnderEditChange({
+      contactEmail: this.props.taskUnderEdit.contactEmail.value,
+      taskName: newValue
+    });
+  }
+
+  onContactEmailChange(newValue) {
+    this.props.onTaskUnderEditChange({
+      contactEmail: newValue,
+      taskName: this.props.taskUnderEdit.taskName.value,
+    });
+  }
+
+  render() {
+    const { taskUnderEdit: { taskName, contactEmail } } = this.props;
+
+    const allowedToSave = taskName.isValid && contactEmail.isValid;
+
+    return (
+      <div>
+        <InputField label="Taaknaam"
+                    onChange={(ev) => this.onTaskNameChange(ev.target.value)}
+                    field={taskName} />
+        <InputField label="Contact email"
+                    onChange={(ev) => this.onContactEmailChange(ev.target.value)}
+                    field={contactEmail} />
+        <button disabled={!allowedToSave} className="btn btn-default">
+          Ok
+        </button>
+      </div>
+    );
+  }
+}
+
+export default TaskForm;
 ```
 
 InputField.js
 ```javascript
+import React from "react";
+import ValidBox from "./ValidBox";
+
+const InputField = (props) => {
+  const { field: {isValid, value}, label, onChange } = props;
+  return (
+    <div className="form-row row">
+      <label className="col-md-2">{label}</label>
+      <div className="input-group col-md-10">
+        <ValidBox isValid={isValid} />
+        <input onChange={onChange} type="text" className="form-control" value={value} />
+      </div>
+    </div>
+  );
+}
+
+export default InputField;
 ```
 
 task-management.js
 ```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  taskUnderEdit: {
+    taskName: {value: "", isValid: false},
+    contactEmail: {value: "", isValid: false},
+    id: null
+  }
+};
+
+export default function(state, action) {
+  if (typeof state === 'undefined') {
+    return initialState;
+  }
+  switch (action.type) {
+    case ActionTypes.UPDATE_TASK_UNDER_EDIT:
+      return {
+        taskUnderEdit: {
+          ...state.taskUnderEdit,
+          contactEmail: action.payload.contactEmail,
+          taskName: action.payload.taskName
+        }
+      }
+    default:
+      return state;
+  }
+}
 ```
 
 ActionTypes.js
 ```javascript
+export default {
+  UPDATE_TASK_UNDER_EDIT: "UPDATE_TASK_UNDER_EDIT"
+}
 ```
 
 
