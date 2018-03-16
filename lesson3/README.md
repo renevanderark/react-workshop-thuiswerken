@@ -404,7 +404,7 @@ Om onze nieuwe action volledig te integreren met de rest van de app moeten we we
 - store/task-management.js (past de waarde van zijn state aan met de payload)
 - ActionTypes.js (krijgt een entry genaamd UPDATE_TASK_UNDER_EDIT)
 
-index.js
+index.js - roept de action creator aan met de dispatch functie van redux en geeft action door aan NewTask
 ```javascript
 import React from "react";
 import ReactDOM from "react-dom";
@@ -443,7 +443,7 @@ window.addEventListener("DOMContentLoaded", () =>
 );
 ```
 
-NewTask.js
+NewTask.js - geeft onTaskUnderEditChange door via _props_ aan TaskForm
 ```javascript
 import React from "react";
 import {connect} from "react-redux";
@@ -462,7 +462,7 @@ const NewTask = (props) => (
 export default connect((state) => state.taskManagement)(NewTask);
 ```
 
-TaskForm.js
+TaskForm.js - roept onTaskUnderEditChange aan wanneer de waarde van een invoerveld verandert
 ```javascript
 import React from "react";
 import InputField from "../form-util/InputField";
@@ -507,7 +507,7 @@ class TaskForm extends React.Component {
 export default TaskForm;
 ```
 
-InputField.js
+InputField.js - krijgt een nieuwe onChange _prop_ om de eigen wijziging mee door te geven aan TaskForm
 ```javascript
 import React from "react";
 import ValidBox from "./ValidBox";
@@ -528,7 +528,7 @@ const InputField = (props) => {
 export default InputField;
 ```
 
-task-management.js
+task-management.js - past de waarde van zijn state aan met de payload
 ```javascript
 import ActionTypes from "../action-types";
 
@@ -559,15 +559,222 @@ export default function(state, action) {
 }
 ```
 
-ActionTypes.js
+ActionTypes.js - krijgt een entry genaamd UPDATE_TASK_UNDER_EDIT
 ```javascript
 export default {
   UPDATE_TASK_UNDER_EDIT: "UPDATE_TASK_UNDER_EDIT"
 }
 ```
 
+Dat waren een hoop ingrepen. Herlaad in de browser en check goed je console en webpack output op mogelijke fouten. Als het klopt kun je nu weer typen, werken de validatievinkjes en kan de knop nu van disabled naar enabled gaan en terug.
+
+Hulp nodig bij debuggen? Loop gewoon even langs! Ik zit ervoor. Wees gerust, dit is de stijlste leercurve geweest, er is niets mis mee om deze oefening zorgvuldig te herhalen, start dan gewoon met de map in ```../lesson2/je-project```.
 
 ## En nu asynchroon - (redux-thunk)
+
+Zoals beloofd los ik nog even het mysterie van ```redux-thunk``` op. Standaard kun je alleen een plain javascript object meegeven aan de dispatcher van ```redux```, een directe return waarde van de action.
+
+Maar wanneer je een asynchrone handeling moet doen (zoals een instructie aan de server geven via ajax en de response afwachten) heb je alleen callbacks tot je beschikking, geen directe returns.
+
+Laten we die situatie nabootsen met een mock ajax call.
+
+We voegen hem in in ```src/actions.js``` en hangen er nog een action aan.
+actions.js
+```javascript
+// (...) niets weghalen!
+const mockAjaxSave = (request, onResponse) => {
+  const responseBody = JSON.stringify({
+    ...request.data,
+    id: "doe-hier-iets-randoms"
+  });
+
+  setTimeout(() => onResponse(
+    null, { status: 200, body: responseBody }, responseBody
+  ), 2000)
+}
+
+const saveTaskUnderEdit = () => (dispatch, getState) => {
+  const taskUnderEdit = getState().taskManagement.taskUnderEdit;
+  if (taskUnderEdit.contactEmail.isValid && taskUnderEdit.taskName.isValid) {
+    dispatch({type: ActionTypes.SAVING_TASK_UNDER_EDIT});
+    mockAjaxSave({
+      data: taskUnderEdit
+    }, (error, response, body) => {
+      dispatch({type: ActionTypes.TASK_UNDER_EDIT_SAVED, /* TODO: response data meegeven */ })
+    });
+  }
+};
+
+// de action creator:
+export default function(dispatch) {
+  return {
+    onTaskUnderEditChange: (newValues) => dispatch(updateTaskUnderEdit(newValues)),
+    onSaveTaskUnderEdit: () => dispatch(saveTaskUnderEdit())
+  };
+}
+```
+
+Redux-thunk gaat ervoor zorgen dat je een higher order function mag teruggeven aan de dispatcher, die zelf weer toegang heeft tot de dispatcher en de functie ```getState```, waarmee je toegang krijgt tot de huidige app _state_ volgens de store:
+
+index.js
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import thunk from "redux-thunk";
+
+/* meer imports (...) */
+
+const store = createStore(combineReducers({
+  taskManagement: taskManagementReducer,
+  taskOverview: taskOverviewReducer
+}), applyMiddleware(thunk));
+
+const {
+  onTaskUnderEditChange,
+  onSaveTaskUnderEdit
+} = actionCreator(store.dispatch);
+
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.2">Takenbeheer</Header>
+        <NewTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <TaskOverview />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
+```
+
+Vergeet niet de ActionTypes.js uit te bereiden:
+```javascript
+export default {
+  UPDATE_TASK_UNDER_EDIT: "UPDATE_TASK_UNDER_EDIT",
+  SAVING_TASK_UNDER_EDIT: "SAVING_TASK_UNDER_EDIT",
+  TASK_UNDER_EDIT_SAVED: "TASK_UNDER_EDIT_SAVED"
+}
+```
+
+Nu voegen we een property ```saving``` toe aan de task-management reducer:
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  taskUnderEdit: {
+    taskName: {value: "", isValid: false},
+    contactEmail: {value: "", isValid: false},
+    id: null
+  },
+  saving: false
+};
+
+export default function(state, action) {
+  if (typeof state === 'undefined') {
+    return initialState;
+  }
+  switch (action.type) {
+    case ActionTypes.SAVING_TASK_UNDER_EDIT:
+      return {
+        ...state,
+        saving: true
+      };
+    case ActionTypes.TASK_UNDER_EDIT_SAVED:
+      return {
+        ...state,
+        saving: false
+      };
+      break;
+    case ActionTypes.UPDATE_TASK_UNDER_EDIT:
+      return {
+        ...state,
+        taskUnderEdit: {
+          ...state.taskUnderEdit,
+          contactEmail: action.payload.contactEmail,
+          taskName: action.payload.taskName
+        }
+      }
+    default:
+      return state;
+  }
+}
+```
+
+En bieden we alles weer aan via de _props_ van NewTask en TaskForm
+NewTask.js
+```javascript
+import React from "react";
+import {connect} from "react-redux";
+import TaskForm from "./TaskForm";
+
+const NewTask = (props) => (
+  <div className="card">
+    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-body">
+      <TaskForm onTaskUnderEditChange={props.onTaskUnderEditChange}
+                onSaveTaskUnderEdit={props.onSaveTaskUnderEdit}
+                taskUnderEdit={props.taskUnderEdit}
+                saving={props.saving} />
+    </div>
+  </div>
+);
+
+export default connect((state) => state.taskManagement)(NewTask);
+```
+
+TaskForm.js
+```javascript
+import React from "react";
+import InputField from "../form-util/InputField";
+
+class TaskForm extends React.Component {
+
+  onTaskNameChange(newValue) {
+    this.props.onTaskUnderEditChange({
+      contactEmail: this.props.taskUnderEdit.contactEmail.value,
+      taskName: newValue
+    });
+  }
+
+  onContactEmailChange(newValue) {
+    this.props.onTaskUnderEditChange({
+      contactEmail: newValue,
+      taskName: this.props.taskUnderEdit.taskName.value,
+    });
+  }
+
+  render() {
+    const { saving, taskUnderEdit: { taskName, contactEmail } } = this.props;
+
+    const allowedToSave = taskName.isValid && contactEmail.isValid;
+
+    return saving
+    ? (
+      <div>Bezig met opslaan...</div>
+    )
+    : (
+      <div>
+        <InputField label="Taaknaam"
+                    onChange={(ev) => this.onTaskNameChange(ev.target.value)}
+                    field={taskName} />
+        <InputField label="Contact email"
+                    onChange={(ev) => this.onContactEmailChange(ev.target.value)}
+                    field={contactEmail} />
+        <button onClick={this.props.onSaveTaskUnderEdit}
+          disabled={!allowedToSave} className="btn btn-default">
+          Ok
+        </button>
+      </div>
+    );
+  }
+}
+
+export default TaskForm;
+```
+
+Ik ben benieuwd of alles het nog doet. Probeer het eens uit in de browser.
 
 ## Zelf doen!
 

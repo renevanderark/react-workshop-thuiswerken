@@ -9,6 +9,11 @@ export default function(state, action) {
     return initialState;
   }
   switch (action.type) {
+    case ActionTypes.TASK_UNDER_EDIT_SAVED:
+      return {
+        ...state,
+        tasks: state.tasks.concat(action.payload)
+      };
     default:
       return state;
   }
