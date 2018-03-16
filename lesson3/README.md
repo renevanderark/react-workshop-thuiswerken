@@ -259,9 +259,10 @@ De functie ```connect``` is een higher order function. Hij geeft een functie ter
 Het argument van ```connect``` is dus een callback functie met de volgende signatuur:
 - Parameter _state_:  de state van de hele app (van de store)
 - Returns: _state_ bedoeld voor het component
+
 Connect geeft dan een functie terug die we direct aanroepen op onze component class.
 
-Zoals je ziet geef ik de property genaamd _taskmanagement_  terug in de callback. Dit is altijd dezelfde propertynaam als degene die we aan ```combineReducers``` meegaven in de ```index.js```.
+Zoals je ziet geef ik de property genaamd _taskManagement_  terug in de callback. Dit is altijd dezelfde propertynaam als degene die we aan ```combineReducers``` meegaven in de ```index.js```.
 
 TaskOverview.js
 ```javascript
