@@ -404,6 +404,55 @@ Om onze nieuwe action volledig te integreren met de rest van de app moeten we we
 - store/task-management.js (past de waarde van zijn state aan met de payload)
 - ActionTypes.js (krijgt een entry genaamd UPDATE_TASK_UNDER_EDIT)
 
+index.js
+```javascript
+```
+
+NewTask.js
+```javascript
+```
+
+TaskForm.js
+```javascript
+```
+
+InputField.js
+```javascript
+```
+
+task-management.js
+```javascript
+```
+
+ActionTypes.js
+```javascript
+```
 
 
 ## En nu asynchroon - (redux-thunk)
+
+## Zelf doen!
+
+Eindelijk mag je iets zelf doen.
+
+Zorg ervoor dat wanneer de gebruiker op Ok drukt hetvolgende gebeurt:
+- Het formulier 'Nieuwe taak aanmaken' leeg is
+- De nieuwe taak is toegevoegd aan de array ```tasks``` in de reducer task-overview
+- De nieuwe taak heeft defaultwaardes voor 'id', 'timestamp' en 'status'
+
+Maak natuurlijk wel gebruik van het hierboven omschreven _pattern_. Kom je er niet uit? Gluur gerust in het submapje ```je-project``` van deze lesson3 map.
+
+Ik verwacht dat het ```<pre>``` blokje onder takenoverzicht er dan zo uitziet.
+```json
+{
+  "tasks": [
+    {
+      "id": "iets-randoms-of-zo",
+      "taskName": "naam taak",
+      "contactEmail": "contact@test.foo",
+      "status": "wachtrij",
+      "timeStamp": 1521201886921
+    }
+  ]
+}
+```
