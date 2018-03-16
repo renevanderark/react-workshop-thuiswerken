@@ -114,7 +114,7 @@ We hebben twee top-level componenten die we dynamisch van data gaan voorzien:
 - task-management/NewTask
 - task-overview/TaskOverview
 
-Het datamodel dat ze moeten kennen we ook al een beetje. Vaak dicteren de props van componenten in je ontwerp ook je properties in je store objecten.
+Het datamodel dat ze hebben kennen we ook al een beetje. Vaak dicteren de props van componenten in je ontwerp ook je properties in je store objecten.
 
 Maak nu de files ```src/store/task-management.js``` en ```src/store/task-overview.js``` aan. Dit worden je reducers.
 
@@ -256,6 +256,13 @@ connect(function(state) {
 ```
 De functie ```connect``` is een higher order function. Hij geeft een functie terug, die we direct aanroepen op ons component ```NewTask```. Zowel de Provider als de connect-functie doen wat onzichtbare magie, maar gelukkig kun je gewoon op github gluren naar wat er precies gebeurt. Voor deze cursus zijn we alleen nieuwsgierig naar het _effect_. Daarom heb ik een ```<pre>```-blokje toegevoegd die de props laat zien. Haal je de connector weg, dan is props weer een leeg object.
 
+Het argument van ```connect``` is dus een callback functie met de volgende signatuur:
+- Parameter _state_:  de state van de hele app (van de store)
+- Returns: _state_ bedoeld voor het component
+Connect geeft dan een functie terug die we direct aanroepen op onze component class.
+
+Zoals je ziet geef ik de property genaamd _taskmanagement_  terug in de callback. Dit is altijd dezelfde propertynaam als degene die we aan ```combineReducers``` meegaven in de ```index.js```.
+
 TaskOverview.js
 ```javascript
 import React from "react";
@@ -356,6 +363,47 @@ Alle _state_ in je componenten die invloed heeft op de rest van de applicatie ho
 Gebruik ```setState``` spaarzaam, wanneer de state echt alleen bij het component hoort (visuele effectjes bijvoorbeeld), of wanneer performance echt een rol blijkt te spelen (frequentie van rerenders). Maar zelfs dan kun je eerst nog kijken naar de lifecycle method (PREMATURE OPTIMIZATION) ```shouldComponentUpdate```.
 
 ## Je Actions - de data manipulaties
+
+Actions zijn dus functies die de dispatcher aanroepen om de store te updaten. Ze worden aan de gebruiker aangeboden via React componenten als props.
+
+We beginnen met een action creator die 1 actie aanbiedt die alles doet wat we eerst via ```setState``` deden in InputField.
+
+Maak de file ```src/actions.js``` aan met de volgende inhoud:
+```javascript
+import ActionTypes from "./action-types";
+
+const updateTaskUnderEdit = (newValues) => {
+  return {
+    type: ActionTypes.UPDATE_TASK_UNDER_EDIT,
+    payload: {
+      contactEmail: {
+        value: newValues.contactEmail,
+        isValid: !!newValues.contactEmail.match(/.+\@.+\..+/)
+      },
+      taskName: {
+        value: newValues.taskName,
+        isValid: newValues.taskName.length > 3
+      }
+    }
+  };
+}
+
+// de action creator:
+export default function(dispatch) {
+  return {
+    onTaskUnderEditChange: (newValues) => dispatch(updateTaskUnderEdit(newValues))
+  };
+}
+```
+
+Om onze nieuwe action volledig te integreren met de rest van de app moeten we weer een aantal files aanpassen:
+- index.js (roept de action creator aan met de dispatch functie van redux en geeft action door aan NewTask)
+- NewTask.js (geeft onTaskUnderEditChange door via _props_ aan TaskForm)
+- TaskForm.js (roept onTaskUnderEditChange aan wanneer de waarde van een invoerveld verandert)
+- InputField.js (krijgt een nieuwe onChange _prop_ om de eigen wijziging mee door te geven aan TaskForm)
+- store/task-management.js (past de waarde van zijn state aan met de payload)
+- ActionTypes.js (krijgt een entry genaamd UPDATE_TASK_UNDER_EDIT)
+
 
 
 ## En nu asynchroon - (redux-thunk)
