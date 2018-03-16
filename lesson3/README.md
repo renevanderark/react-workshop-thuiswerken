@@ -217,6 +217,9 @@ window.addEventListener("DOMContentLoaded", () =>
   ),  document.getElementById("app"))
 );
 ```
+De ```store``` wordt gebakken door de ```redux```-functies ```createStore``` en ```combineReducers```. hierboven staat al wat de store doet.
+
+De ```Provider``` van ```react-redux``` snapt deze store en kan hier met een _connector_ props van maken voor React componenten. Dat staat uitgelegd onder het volgende kopje.
 
 Als je nu de app opent in de browser is er niets veranderd! :)
 
@@ -226,9 +229,36 @@ TIP: als je stiekem toch met de [React devtools](https://fb.me/react-devtools) h
 
 ## Je Views - de statische presentatie van de single source of truth (per data update)
 
-Wat je gaat zien is dat er in je App component _props_ zijn bijgekomen. Het is heel handig om de props zo nu en dan terug te printen in een pre blokje
-App.js
+We moeten de Provider nog vertellen welk component welke props moet ontvangen van de store. Hiertoe shipt ```react-redux``` de functie ```connect```. Dit gaan we nu doen in NewTask en TaskOverview.
+
+NewTask.js
+```javascript
+import React from "react";
+import {connect} from "react-redux";
+import TaskForm from "./TaskForm";
+
+const NewTask = (props) => (
+  <div className="card">
+    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-body">
+      <pre>{JSON.stringify(props, null, 2)}</pre>
+      <TaskForm />
+    </div>
+  </div>
+);
+
+export default connect((state) => state.taskManagement)(NewTask);
 ```
+Hier is de functie ```connect``` dus nieuw. De change staat in de laatste regel. Het ziet er nu wel heel compact uit, maar voor één keer herschrijf ik het wel naar ES5 zodat je snapt wat er gebeurt:
+```javascript
+connect(function(state) {
+  return state.taskManagement;
+})(NewTask);
+```
+De functie ```connect``` is een higher order function. Hij geeft een functie terug, die we direct aanroepen op ons component ```NewTask```. Zowel de Provider als de connect-functie doen wat onzichtbare magie, maar gelukkig kun je gewoon op github gluren naar wat er precies gebeurt. Voor deze cursus zijn we alleen nieuwsgierig naar het _effect_. Daarom heb ik een ```<pre>```-blokje toegevoegd die de props laat zien. Haal je de connector weg, dan is props weer een leeg object.
+
+TaskOverview.js
+```javascript
 
 ```
 
