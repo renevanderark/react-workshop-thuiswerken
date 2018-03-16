@@ -108,8 +108,132 @@ Volgens mij is dat alles, we gaan aan de slag.
 
 ## Je Reducers (Store) - data driven design
 
-## Je Actions - de data manipulaties
+Grofweg kun je de reducers in de store de top-level componenten die je hebt laten representeren.
+
+We hebben twee top-level componenten die we dynamisch van data gaan voorzien:
+- task-management/NewTask
+- task-overview/TaskOverview
+
+Het datamodel dat ze moeten kennen we ook al een beetje. Vaak dicteren de props van componenten in je ontwerp ook je properties in je store objecten.
+
+Maak nu de files ```src/store/task-management.js``` en ```src/store/task-overview.js``` aan. Dit worden je reducers.
+
+Maak ook alvast de file ```src/action-types.js``` aan. Dit wordt een eenvoudig object om alle actions te voorzien van een type voor de dispatcher.
+
+task-management.js
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  taskUnderEdit: {
+    taskName: "",
+    contactEmail: "",
+    isValid: false,
+    id: null
+  }
+};
+
+export default function(state, action) {
+  if (typeof state === 'undefined') {
+    return initialState;
+  }
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+```
+Zoals je ziet bevat initialState al herkenbare dingen. We gaan nu redux de baas maken van de _state_ van de taak die onder bewerking is in het TaskForm component. We bereiden ons alvast voor op het moment dat dit formulier kan worden hergebruikt door een EditTask component door een ```id```-property toe te kennen aan ```taskUnderEdit```.
+
+De functie die wordt teruggegeven heeft het signatuur van alle ```redux``` reducers:
+- de _state_ parameter bevat de state vóórdat de action _payload_ is verwerkt door de reducer
+- de _action_ parameter bevat _altijd_ een ```type``` property (beschreven in ActionTypes) en soms ook een _payload_  property (waarvan jij zelf de naam kiest)
+- de state die wordt teruggegeven is de state zoals jij wilt dat die is op basis van de ActionType en de _payload_ van de action. Soms wil je ook niets veranderen, de ```default```-case in de switch.
+
+task-overview.js
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  tasks: []
+};
+
+export default function(state, action) {
+  if (typeof state === 'undefined') {
+    return initialState;
+  }
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+```
+
+Dit datamodel wordt een lijst. We beginnen maar gewoon met een lege array.
+
+action-types.js
+```javascript
+export default {
+  /* TODO */
+}
+```
+
+Deze gaan we vullen wanneer we Actions gaan maken.
+
+Nu we de datamodellen hebben klaargezet gaan we aan ```redux``` vertellen waar ze staan. Als het klopt weet redux daarmee genoeg over je reducers.
+Bovendien gaan we nu de Provider uit ```react-redux``` inzetten om de inhoud van de store door te sluizen naar de Views via hun _props_.
+
+Voor nu doen we dat allemaal in de ```src/index.js```
+
+index.js
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore, combineReducers } from 'redux';
+import { Provider } from "react-redux";
+
+import taskManagementReducer from "./store/task-management";
+import taskOverviewReducer from "./store/task-overview";
+
+import App from "./components/App";
+import Header from "./components/layout/Header";
+import NewTask from "./components/task-management/NewTask";
+import TaskOverview from "./components/task-overview/TaskOverview";
+
+const store = createStore(combineReducers({
+  taskManagement: taskManagementReducer,
+  taskOverview: taskOverviewReducer
+}));
+
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.2">Takenbeheer</Header>
+        <NewTask />
+        <TaskOverview />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
+```
+
+Als je nu de app opent in de browser is er niets veranderd! :)
+
+Niets zichtbaars in ieder geval. Daar komt snel verandering in.
+
+TIP: als je stiekem toch met de [React devtools](https://fb.me/react-devtools) hebt gewerkt, zie je in die console wel degelijk verschillen.
 
 ## Je Views - de statische presentatie van de single source of truth (per data update)
+
+Wat je gaat zien is dat er in je App component _props_ zijn bijgekomen. Het is heel handig om de props zo nu en dan terug te printen in een pre blokje
+App.js
+```
+
+```
+
+
+## Je Actions - de data manipulaties
+
 
 ## En nu asynchroon - (redux-thunk)
