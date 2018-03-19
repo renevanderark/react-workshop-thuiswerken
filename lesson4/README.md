@@ -342,6 +342,29 @@ Implementeer het kruisje van de message box:
 - Zorg dat de messages reducer "ON_REMOVE_MESSAGE" de message de index uit ```messageIndex``` weghaalt uit de ```messages``` arrays
 - Zorg dat onRemoveMessage wordt aangeroepen wanneer de gebruiker op het kruisje klikt
 
-LEESVOER:  [Immutable Update Patterns: Inserting and Removing Items in Arrays])(https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns#inserting-and-removing-items-in-arrays)
+LEESVOER:  [Immutable Update Patterns: Inserting and Removing Items in Arrays](https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns#inserting-and-removing-items-in-arrays)
 
 ## Websockets
+
+Zoals je misschien wel gemerkt hebt leent React zich heus niet voor elke use-case. Ik zou er geen door Google indexeerbare websites mee bouwen. Waarom ik toch de moeite heb genomen om deze cursus te maken is omdat er ook use cases zijn waarvoor React wel heel bruikbaar is:
+- Cross device apps (zo nodig via phonegap-/cordova-achtige constructies; [spelletje](https://play.google.com/store/apps/details?id=nl.rene.fluxagon)/ [source](https://github.com/renevanderark/hexagons))
+- Beheerinterfaces met eventueel...
+- Real time dashboards ([filmpje](https://youtu.be/A5QepEMuLH0) / [prototype source](https://rel-git-p100.wpakb.kb.nl/RAR020/2017-dare2-IR/tree/prototype))
+
+Die laatste 2, vooral die laatste, varen wel bij real-time data; ge_pusht_ door de server. Nu heb je vast wel eens zo'n chatbox tutorial gedaan met webtechnologie x, y of z. Mijn oude favoriet was [Faye](https://faye.jcoglan.com). Dit omdat de belofte van WebSockets steeds uitbleef. Tegenwoordig is zit er in elke moderne desktop browser wel een uitgerijpte WebSocket-client: [RFC 6455](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API).
+
+Ook voor Jetty is er een goed uitgerijpte [Websocket server](http://www.eclipse.org/jetty/documentation/9.4.x/jetty-websocket-server-api.html) implementatie.
+
+De kritiek die ik deel met veel collega's op deze hele _frameworks_ voor _single page apps_ werkwijze is dat de browser wordt omgetoverd in een soort operating system. Maar is de browser dan _echt_ zo'n rare keuze voor een operating system. Is niet het hele _Chromebook_ idee daarop gebaseerd? Verreweg de eenvoudigste manier om cross-device, cross-OS graphical user interfaces te bouwen zonder dat iemand een .exe of .jar hoeft te installeren is deze werkwijze.
+
+Zeker wanneer meerdere gebruikers tegelijk moeten werken in hetzelfde dashboard is een websocket implementatie geen overbodige luxe.
+
+Dus om het argument hierboven dus nog even om te draaien (Ik zou er geen door Google indexeerbare websites mee bouwen):
+Ik zou geen cross-device apps, noch beheerinterfaces met eventueel real-time dashboards gaan bouwen in PHP met een laagje jQuery, laat staan in Zend Server. (Dat laagje jQuery wordt groter en groter, het PHP deel wordt meer een meer een veredelde proxy naar de achterliggende REST service die we altijd in Java bouwen).
+
+Nu we dat achter de rug hebben wil ik je het volgende laten doen:
+- In plaats van de frontend elke keer de takenlijst te laten ophalen via xhr, gaat de frontend luisteren naar een websocket.
+- Om alles wat mooier te maken gaan we het ```<pre>```-blok onder takenoverzicht vervangen door een ```jsx```-component
+- In dat nieuwe component implementeren we nog een play knop, die de taken laat 'draaien' op de server.
+
+Punt 1 en 2 doe ik voor. Punt 3 wordt weer 'Zelf doen'.

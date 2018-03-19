@@ -45,7 +45,7 @@ Dit is de langste en moeilijkste aflevering, maar al die hipsters doen het ook! 
 Maar als het klopt heb je die 'Unidirectional _flow_ of data' nu wel een beetje onder de knie. Wederom, het _lijkt_ veel boilerplate, maar door trouw dit paradigma toe te blijven passen zul je merken dat je framework (nu heb je wél een framework te pakken) ervoor zorgt dat je razendsnel je app kan wijzigen én uitbreiden met nieuwe features.
 
 
-### [Les 4](https://rel-git-p100.wpakb.kb.nl/RAR020/react-workshop/tree/master/lesson4): Ajax / xhr / REST
+### [Les 4](https://rel-git-p100.wpakb.kb.nl/RAR020/react-workshop/tree/master/lesson4): Ajax / xhr / websockets
 
 En eindelijk is het _framework_ compleet, nu je kunt praten met een backend en de state van je App _altijd_ correct de waarheid op de server laten representeren -- toch?
 
