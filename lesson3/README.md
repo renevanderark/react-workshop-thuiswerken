@@ -226,6 +226,8 @@ Niets zichtbaars in ieder geval. Daar komt snel verandering in.
 
 TIP: als je stiekem toch met de [React devtools](https://fb.me/react-devtools) hebt gewerkt, zie je in die console wel degelijk verschillen.
 
+LEESVOER:  [Immutable Update Patterns])(https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns)
+
 ## Je Views - de statische presentatie van de single source of truth (per data update)
 
 We moeten de Provider nog vertellen welk component welke props moet ontvangen van de store. Hiertoe shipt ```react-redux``` de functie ```connect```. Dit gaan we nu doen in NewTask en TaskOverview.

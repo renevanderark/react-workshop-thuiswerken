@@ -14,17 +14,22 @@ let tasks = [
 app.use(bodyParser.json());
 
 app.post('/tasks', (req, res) => {
-	const newTask = {
-		contactEmail: req.body.contactEmail,
-    taskName: req.body.taskName,
-    id: `${Math.random() * new Date().getTime()}`,
-    timeStamp: new Date().getTime(),
-    status: "wachtrij"
-	};
 
-	tasks.push(newTask);
+	if (req.body.taskName.match(/fout/i)) {
+		setTimeout(() => res.status(400).send({message: "Deze taak kunnen we zo niet aanmaken"}), 500);
+	} else {
+		const newTask = {
+			contactEmail: req.body.contactEmail,
+	    taskName: req.body.taskName,
+	    id: `${Math.random() * new Date().getTime()}`,
+	    timeStamp: new Date().getTime(),
+	    status: "wachtrij"
+		};
 
-	setTimeout(() =>res.send(JSON.stringify(newTask)), 1000);
+		tasks.push(newTask);
+		setTimeout(() => res.send(JSON.stringify(newTask)), 1000);
+	}
+
 });
 
 app.get('/tasks', (req, res) => {

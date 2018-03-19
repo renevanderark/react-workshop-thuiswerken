@@ -56,7 +56,7 @@ npm install xhr --save-dev
 ```
 
 De flux architectuur indachtig moeten we dus een Action maken om de taken op te halen (of eigenlijk 2).
-ActionTypes.js:
+action-types.js:
 ```javascript
 export default {
   UPDATE_TASK_UNDER_EDIT: "UPDATE_TASK_UNDER_EDIT",
@@ -203,5 +203,145 @@ const saveTaskUnderEdit = () => (dispatch, getState) => {
 Als je nu de pagina herlaadt heb je het al geïmplementeerd. Ook hiervoor heb ik in ```je-backend``` een kunstmatige vertraging geïntroduceerd.
 
 ## Foutafhandeling
+
+Wat zou een frontend moeten doen met een foutmelding van de server? Daar zijn natuurlijk weer een heleboel antwoorden op te bedenken, maar ik ben fan van gewoon terugmelden aan de gebruiker.
+
+Fouten en meldingen zijn een React component op zich, dus die voegen we eerst toe aan de app.
+Maak maar een nieuwe file en dir ervoor aan ```src/components/messages/Messages.js```.
+```javascript
+import React from "react";
+import { connect } from "react-redux";
+
+const Messages = (props) => (
+  <div>
+    {props.messages.map((message, idx) => (
+      <div key={idx} className={`alert alert-${message.level}`}>
+        {message.text}
+        <button className="close">
+          <span>&times;</span>
+        </button>
+      </div>
+    ))}
+  </div>
+);
+
+export default connect(state => state.messages)(Messages)
+```
+
+LET OP: je ziet hier een nieuwe gereserveerde _prop_ genaamd ```key```. [Deze key](https://reactjs.org/docs/lists-and-keys.html) is nodig wanneer je arrays mapt naar ```jsx```-nodes.
+
+LET OP: de meldingen zijn een nieuw top-level component. Ze worden direct gevoed uit een nieuwe reducer. Daarom heb je ook hier weer een connector.
+
+Met zijn eigen reducer ```src/store/messages.js```.
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  messages: []
+};
+
+export default function(state, action) {
+  if (typeof state === 'undefined') {
+    return initialState;
+  }
+  switch (action.type) {
+    case ActionTypes.ON_ERROR_MESSAGE:
+      return {
+        messages: [{text: action.payload, level: "danger"}].concat(state.messages)
+      }
+    default:
+      return state;
+  }
+}
+```
+
+Vergeet de ActionType niet toe te voegen in action-types.js:
+```javascript
+export default {
+  UPDATE_TASK_UNDER_EDIT: "UPDATE_TASK_UNDER_EDIT",
+  SAVING_TASK_UNDER_EDIT: "SAVING_TASK_UNDER_EDIT",
+  TASK_UNDER_EDIT_SAVED: "TASK_UNDER_EDIT_SAVED",
+
+  REQUEST_TASKS: "REQUEST_TASKS",
+  RECEIVE_TASKS: "RECEIVE_TASKS",
+
+  ON_ERROR_MESSAGE: "ON_ERROR_MESSAGE"
+}
+```
+
+En voeg hem in in als kind van de App in index.js
+```javascript
+// (...) bestaande imports
+import messagesReducer from "./store/messages";
+import Messages from "./components/messages/Messages";
+
+const store = createStore(combineReducers({
+  taskManagement: taskManagementReducer,
+  taskOverview: taskOverviewReducer,
+  messages: messagesReducer
+}), applyMiddleware(thunk));
+
+// (...) bestaande code
+
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.3">Takenbeheer</Header>
+        <Messages />
+        <NewTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <TaskOverview />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
+```
+
+Het enige dat we nu nog hoeven te doen is de status en error uitlezen uit de server response en de dispatcher te voeden met ON_ERROR_MESSAGE.
+actions.js
+```javascript
+// (...) bestaande code
+
+const saveTaskUnderEdit = () => (dispatch, getState) => {
+  const taskUnderEdit = getState().taskManagement.taskUnderEdit;
+  if (taskUnderEdit.contactEmail.isValid && taskUnderEdit.taskName.isValid) {
+    dispatch({type: ActionTypes.SAVING_TASK_UNDER_EDIT});
+    xhr({
+      url: "/tasks",
+      method: "POST",
+      headers: { "Accept": "application/json", "Content-type": "application/json" },
+      data: JSON.stringify({
+        contactEmail: taskUnderEdit.contactEmail.value,
+        taskName: taskUnderEdit.taskName.value
+      })
+    }, (error, response, body) => {
+      dispatch({type: ActionTypes.TASK_UNDER_EDIT_SAVED }); // we blijven deze versturen, maar de naam klopt dus niet in alle gevallen.
+      if (error != null) {
+        dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: "Fout bij het opslaan" });
+      } else if (response.statusCode < 200 || response.statusCode >= 400) {
+        dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: `${response.statusCode} - ${JSON.parse(body).message}` });
+      } else {
+        dispatch(fetchTasks());
+      }
+    });
+  }
+};
+
+// (...) bestaande code
+```
+
+Om de nieuwe code te testen kun je een nieuwe taak aanmaken met de taaknaam 'fout' (case insensitive).
+
+De oplettende kijker is misschien opgevallen dat je deze message niet kunt wegklikken met het kruisje. Dat is weer een leuke 'zelf doen' opdracht, me dunkt.
+
+## Zelf doen
+Implementeer het kruisje van de message box:
+- Maak een nieuwe ActionType aan: "ON_REMOVE_MESSAGE"
+- Maak een nieuwe action aan in de action creator: onRemoveMessage(messageIndex)
+- Zorg dat de messages reducer "ON_REMOVE_MESSAGE" de message de index uit ```messageIndex``` weghaalt uit de ```messages``` arrays
+- Zorg dat onRemoveMessage wordt aangeroepen wanneer de gebruiker op het kruisje klikt
+
+LEESVOER:  [Immutable Update Patterns: Inserting and Removing Items in Arrays])(https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns#inserting-and-removing-items-in-arrays)
 
 ## Websockets
