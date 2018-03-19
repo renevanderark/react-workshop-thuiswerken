@@ -368,3 +368,119 @@ Nu we dat achter de rug hebben wil ik je het volgende laten doen:
 - In dat nieuwe component implementeren we nog een play knop, die de taken laat 'draaien' op de server.
 
 Punt 1 en 2 doe ik voor. Punt 3 wordt weer 'Zelf doen'.
+
+### Luisteren naar de taken_push_
+
+De initiële xhr request ```GET /tasks``` in ```index.js``` behouden we, maar na het opslaan doen we niet meer een _refetch_. In plaats daarvan gaan we index.js laten luisteren naar de server als volgt:
+```javascript
+// (...) bestaande imports
+import ActionTypes from "./action-types";
+
+// (...) bestaande code.
+
+onFetchTasks(); // haal eerste keer takenlijst op via xhr actionCreator
+const tasksClient = new WebSocket('ws://localhost:3000/tasks');
+
+tasksClient.onmessage = (msg) => store.dispatch({
+  type: ActionTypes.RECEIVE_TASKS,
+  payload: JSON.parse(msg.data)
+});
+
+// (...) bestaande code
+```
+
+Verwijder nu dit else blok uit de functie ```saveTaskUnderEdit``` in ```actions.js```:
+```javascript
+} else {
+ dispatch(fetchTasks());
+}
+```
+
+Als alles goed is kun je nu op dezelfde manier de takenlijst aanvullen.... en: vanuit elke open browser tab zou je dezelfde status moeten zien zonder het herladen van de pagina.
+
+Natuurlijk kun je dit ook allemaal doen door ouderwets te _pollen_: ```window.setInterval(onFetchTasks, 1000);``` in index.js... Sterker nog, je zou het ook beide kunnen doen (als je nog niet heel veel vertrouwen hebt in die websockets).
+
+### Takenoverzicht- en taakcomponent
+
+Sommige dingen horen gewoon thuis in een tabel. Dus dat gaan we doen. Laten we eerst de rijen maken met het nieuwe component Task.
+Maak aan ```src/components/task-overview/Task.js```:
+```javascript
+import React from "react";
+
+
+// https://stackoverflow.com/questions/10073699/pad-a-number-with-leading-zeros-in-javascript#answer-10073788
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+const dateFmt = (date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1, 2)}-${pad(date.getDate(), 2)}T` +
+  `${pad(date.getHours(), 2)}:${pad(date.getMinutes(), 2)}:${pad(date.getSeconds(), 2)}.` +
+  `${pad(date.getMilliseconds(), 3)}Z`;
+
+const Task = ({ taskName, contactEmail, timeStamp, status }) => (
+  <tr>
+    <td><button className="btn btn-sm">►</button></td>
+    <td>{taskName}</td>
+    <td>{status}</td>
+    <td>{contactEmail}</td>
+    <td>{dateFmt(new Date(timeStamp))}</td>
+  </tr>
+);
+
+export default Task;
+```
+
+En dan de rest van de tabel in TaskOverview.js:
+```javascript
+import React from "react";
+import { connect } from "react-redux";
+
+import Task from "./Task";
+
+class TaskOverview extends React.Component {
+
+  render() {
+    const { pending, tasks } = this.props;
+
+    const tableBody = pending
+      ? (<td colSpan="5">Bezig met laden...</td>)
+      : tasks
+          .sort((a, b) => b.timeStamp - a.timeStamp)
+          .map(task => <Task key={task.id} {...task} />);
+
+    return (
+      <div className="card">
+        <div className="card-header">Takenoverzicht</div>
+        <div className="card-body">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Taak starten</th>
+                <th>Naam taak</th>
+                <th>Status</th>
+                <th>Contact</th>
+                <th>Aangemaakt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableBody}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+}
+export default connect((state) => state.taskOverview)(TaskOverview);
+```
+
+## Zelf doen
+
+Implementeer de play knop.
+- Voeg een action toe aan de action creator: ```onPressPlay(taskId)```
+- Zorg dat die action een xhr request doet naar ```PUT /tasks/:taskId/start```, zonder data
+- Zorg natuurlijk ook dat die action wordt correct wordt aangeroepen wanneer de gebruiker op de knop drukt
+- Zorg dat de knop disabled is wanneer de status !== 'wachtrij'

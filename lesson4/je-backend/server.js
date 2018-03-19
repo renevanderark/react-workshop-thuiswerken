@@ -1,6 +1,8 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
+const expressWs = require('express-ws')(app);
+
 
 let tasks = [
 	{
@@ -27,7 +29,11 @@ app.post('/tasks', (req, res) => {
 		};
 
 		tasks.push(newTask);
-		setTimeout(() => res.send(JSON.stringify(newTask)), 1000);
+
+		setTimeout(() => {
+			res.send(JSON.stringify(newTask));
+			expressWs.getWss().clients.forEach(client => client.send(JSON.stringify(tasks)));
+		}, 1000);
 	}
 
 });
@@ -35,6 +41,8 @@ app.post('/tasks', (req, res) => {
 app.get('/tasks', (req, res) => {
 	setTimeout(() =>	res.send(JSON.stringify(tasks)), 1500);
 });
+
+app.ws('/tasks', (ws, req) => { });
 
 app.use('/', express.static(process.env.STATIC_DIR));
 
