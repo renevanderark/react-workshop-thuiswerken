@@ -11,7 +11,7 @@ Dit is een stap voor stap cursus waarbij je aan het eind dit kunt:
 - React componenten bouwen
 - De React kernconcepten kennen (state / props / virtual-DOM / life cycle)
 - Unidirectional flow of data integreren in je app (gebruikmakend van redux en redux-thunk)
-- Ajax (xhr) integreren in je app
+- Ajax (xhr) en websockets integreren in je app
 - Routing met de history package (wrapper voor browser history API)
 - Mogelijk een beetje CSS styling tussendoor
 
@@ -19,8 +19,8 @@ Er gaan een heleboel details voorbij komen waar ik NIET dieper op inga. Dit heef
 - Ik weet ook niet alles
 - Alles wat ik niet noem is online na te lezen in tutorials en documentaties
 - Je wilt snel resultaat zien van je werk
-- Ik wil je _een_ werkwijze opdringen; _best practices_ zijn er niet, want ze veranderen de hele tijd. Op deze manier hebben wij in ieder geval samen dezelfde werkwijze.
-- Deze cursus verstopt maanden aan uitzoekwerk en voortschrijdend inzicht van mijzelf en mijn oude frontend team bij Huygens en biedt een workflow waarmee je supersnel dashboards kunt bouwen voor RESTful services.
+- Ik wil je _een_ werkwijze leren; _best practices_ zijn er niet, want ze veranderen de hele tijd. Op deze manier hebben wij in ieder geval samen dezelfde werkwijze.
+- Deze cursus verstopt maanden aan uitzoekwerk en voortschrijdend inzicht van mijzelf en mijn oude frontend team bij Huygens en biedt een workflow waarmee je supersnel dashboards kunt bouwen voor RESTful services - of nog liever: frontend-driven-design: de backend moet doen wat de gebruiker nodig heeft.
 
 ## Curriculum
 
