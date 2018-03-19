@@ -351,7 +351,7 @@ Zoals je misschien wel gemerkt hebt leent React zich heus niet voor elke use-cas
 - Beheerinterfaces met eventueel...
 - Real time dashboards ([filmpje](https://youtu.be/A5QepEMuLH0) / [prototype source](https://rel-git-p100.wpakb.kb.nl/RAR020/2017-dare2-IR/tree/prototype))
 
-Die laatste 2, vooral die laatste, varen wel bij real-time data; ge_pusht_ door de server. Nu heb je vast wel eens zo'n chatbox tutorial gedaan met webtechnologie x, y of z. Mijn oude favoriet was [Faye](https://faye.jcoglan.com). Dit omdat de belofte van WebSockets steeds uitbleef. Tegenwoordig is zit er in elke moderne desktop browser wel een uitgerijpte WebSocket-client: [RFC 6455](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API).
+Die laatste 2, vooral die laatste, varen wel bij real-time data; _gepusht_ door de server. Nu heb je vast wel eens zo'n chatbox tutorial gedaan met webtechnologie x, y of z. Mijn oude favoriet was [Faye](https://faye.jcoglan.com). Dit omdat de belofte van WebSockets steeds uitbleef. Tegenwoordig is zit er in elke moderne desktop browser wel een uitgerijpte WebSocket-client: [RFC 6455](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API).
 
 Ook voor Jetty is er een goed uitgerijpte [Websocket server](http://www.eclipse.org/jetty/documentation/9.4.x/jetty-websocket-server-api.html) implementatie.
 
@@ -369,7 +369,7 @@ Nu we dat achter de rug hebben wil ik je het volgende laten doen:
 
 Punt 1 en 2 doe ik voor. Punt 3 wordt weer 'Zelf doen'.
 
-### Luisteren naar de taken_push_
+### Luisteren naar de _taken-push_
 
 De initiële xhr request ```GET /tasks``` in ```index.js``` behouden we, maar na het opslaan doen we niet meer een _refetch_. In plaats daarvan gaan we index.js laten luisteren naar de server als volgt:
 ```javascript
