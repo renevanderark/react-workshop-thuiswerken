@@ -70,8 +70,10 @@ export default {
 
 In actions.js:
 ```javascript
-// imports en oude code
+// (...) imports
+import xhr from "xhr";
 
+// (...) bestaande code
 const fetchTasks = () => (dispatch) => {
   dispatch({type: ActionTypes.REQUEST_TASKS});
 
