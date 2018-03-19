@@ -2,7 +2,15 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 
-let tasks = [];
+let tasks = [
+	{
+		contactEmail: "voorgeladen@bk.ln",
+    taskName: "deze zat al in de server",
+    id: `${Math.random() * new Date().getTime()}`,
+    timeStamp: new Date().getTime(),
+    status: "wachtrij"
+	}
+];
 app.use(bodyParser.json());
 
 app.post('/tasks', (req, res) => {
@@ -16,12 +24,11 @@ app.post('/tasks', (req, res) => {
 
 	tasks.push(newTask);
 
-	res.send(JSON.stringify(newTask));
+	setTimeout(() =>res.send(JSON.stringify(newTask)), 1000);
 });
 
 app.get('/tasks', (req, res) => {
-
-	res.send(JSON.stringify(tasks));
+	setTimeout(() =>	res.send(JSON.stringify(tasks)), 1500);
 });
 
 app.use('/', express.static(process.env.STATIC_DIR));
