@@ -21,7 +21,19 @@ Als je nu [http://localhost:3000](http://localhost:3000) opent zie je je project
 Oh ja, LET OP: werkt iets niet zoals verwacht? Dit zijn de versies in de package.json:
 ```json
 "devDependencies": {
-"TO": "DO"
+  "babel-core": "6.26.0",
+  "babel-loader": "7.1.4",
+  "babel-plugin-transform-object-rest-spread": "6.26.0",
+  "babel-preset-env": "1.6.1",
+  "babel-preset-react": "6.24.1",
+  "react": "16.2.0",
+  "react-dom": "16.2.0",
+  "react-redux": "5.0.7",
+  "redux": "3.7.2",
+  "redux-thunk": "2.2.0",
+  "webpack": "4.1.1",
+  "webpack-cli": "2.0.12",
+  "xhr": "2.4.1"
 }
 ```
 
