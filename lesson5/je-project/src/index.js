@@ -13,6 +13,7 @@ import App from "./components/App";
 import Header from "./components/layout/Header";
 import Messages from "./components/messages/Messages";
 import NewTask from "./components/task-management/NewTask";
+import EditTask from "./components/task-management/EditTask";
 import TaskOverview from "./components/task-overview/TaskOverview";
 import ActionTypes from "./action-types";
 
@@ -56,6 +57,8 @@ window.addEventListener("DOMContentLoaded", () =>
         <Header versie="0.0.3">Takenbeheer</Header>
         <Messages onRemoveMessage={onRemoveMessage} />
         <NewTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <EditTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
                 onTaskUnderEditChange={onTaskUnderEditChange} />
         <TaskOverview onPressPlay={onPressPlay} />
       </App>

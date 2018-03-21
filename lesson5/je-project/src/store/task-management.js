@@ -6,7 +6,8 @@ const initialState = {
     contactEmail: {value: "", isValid: false},
     id: null
   },
-  saving: false
+  saving: false,
+  showEdit: false
 };
 
 export default function(state, action) {

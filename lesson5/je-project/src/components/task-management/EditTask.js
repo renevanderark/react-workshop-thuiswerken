@@ -2,9 +2,9 @@ import React from "react";
 import {connect} from "react-redux";
 import TaskForm from "./TaskForm";
 
-const NewTask = (props) => props.showEdit ? null : (
+const EditTask = (props) => props.showEdit ? (
   <div className="card">
-    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-header">Taak bewerken</div>
     <div className="card-body">
       <TaskForm onTaskUnderEditChange={props.onTaskUnderEditChange}
                 onSaveTaskUnderEdit={props.onSaveTaskUnderEdit}
@@ -12,6 +12,6 @@ const NewTask = (props) => props.showEdit ? null : (
                 saving={props.saving} />
     </div>
   </div>
-);
+) : null;
 
-export default connect((state) => state.taskManagement)(NewTask);
+export default connect((state) => state.taskManagement)(EditTask);

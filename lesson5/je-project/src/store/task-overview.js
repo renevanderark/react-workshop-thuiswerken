@@ -2,7 +2,8 @@ import ActionTypes from "../action-types";
 
 const initialState = {
   tasks: [],
-  pending: false
+  pending: false,
+  isVisible: true
 };
 
 export default function(state, action) {

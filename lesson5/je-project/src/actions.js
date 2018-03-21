@@ -66,7 +66,7 @@ const pressPlay = (taskId) => (dispatch) => {
 }
 
 // de action creator:
-export default function(dispatch) {
+export default function(dispatch, navigateTo) {
   return {
     onTaskUnderEditChange: (newValues) => dispatch(updateTaskUnderEdit(newValues)),
     onSaveTaskUnderEdit: () => dispatch(saveTaskUnderEdit()),

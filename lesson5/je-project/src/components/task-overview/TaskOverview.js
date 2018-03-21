@@ -6,6 +6,8 @@ import Task from "./Task";
 class TaskOverview extends React.Component {
 
   render() {
+    if (!this.props.isVisible) { return null; }
+
     const { pending, tasks, onPressPlay } = this.props;
 
     const tableBody = pending

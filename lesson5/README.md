@@ -151,7 +151,7 @@ Zoals je ziet worden de fucties ```navigateTo``` en ```mapRoutes``` uit ```makeR
 - http://localhost:3000/bestaatniet/dus => ```! Unmapped route /bestaatniet/dus```
 - http://localhost:3000/tasks => ```vertraagde JSON response van je-backend```
 
-## Implementeren van de navigatie
+## Voorbereiden op de navigatie
 
 Het wordt natuurlijk de bedoeling dat de callbacks in ```mapRoutes``` een action aanroepen uit de ```actionCreator``` of direct een action versturen via ```store.dispatch```. Ik zat aan de volgende twee nieuwe ActionTypes hiervoor te denken.
 
@@ -176,3 +176,120 @@ export default {
 SHOW_MAIN zorgt ervoor dat alles wat we nu al hebben in ```je-project``` getoond wordt, maar een nieuw te bouwen EditTask component juist niet.
 
 SHOW_EDIT zorgt ervoor dat alléén een nieuw te bouwen EditTask component wordt getoond (waarvan de waardes via ```xhr``` worden opgehaald -> weet je nog het model van ```taskUnderEdit``` in de reducer ```task-management.js```?).
+
+
+Laten we dan nu eerst onze datamodelletjes uitbreiden in onze reducers:
+store/task-management.js
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  taskUnderEdit: {
+    taskName: {value: "", isValid: false},
+    contactEmail: {value: "", isValid: false},
+    id: null
+  },
+  saving: false,
+  showEdit: false // dit is nieuw
+};
+// (...) bestaande code
+```
+
+store/task-overview.js
+```javascript
+import ActionTypes from "../action-types";
+
+const initialState = {
+  tasks: [],
+  pending: false,
+  isVisible: true // dit is nieuw
+};
+
+// (...) bestaande code
+```
+
+En laten we onze top-level componenten deze 'data-verzoeken' laten respecteren.
+
+components/TaskOverview.js
+```javascript
+```
+
+components/NewTask.js
+```javascript
+// (...) bestaande code
+const NewTask = (props) => props.showEdit ? null : ( // dit is nieuw
+  <div className="card">
+    <div className="card-header">Nieuwe taak aanmaken</div>
+    <div className="card-body">
+      <TaskForm onTaskUnderEditChange={props.onTaskUnderEditChange}
+                onSaveTaskUnderEdit={props.onSaveTaskUnderEdit}
+                taskUnderEdit={props.taskUnderEdit}
+                saving={props.saving} />
+    </div>
+  </div>
+);
+// (...) bestaande code
+```
+
+components/TaskOverview.js
+```javascript
+// (...) bestaande code
+class TaskOverview extends React.Component {
+
+  render() {
+    if (!this.props.isVisible) { return null; }
+    // (...) bestaande code
+  }
+}
+// (...) bestaande code
+```
+
+Had ik al verteld dat een react ```render()``` ook ```null``` mag teruggeven voor render niks?
+
+Laten we dan nu ook eerst ons nieuwe component EditTask bouwen en in de app hangen:
+src/components/task-management/EditTask.js
+```javascript
+import React from "react";
+import {connect} from "react-redux";
+import TaskForm from "./TaskForm";
+
+const EditTask = (props) => props.showEdit ? (
+  <div className="card">
+    <div className="card-header">Taak bewerken</div>
+    <div className="card-body">
+      <TaskForm onTaskUnderEditChange={props.onTaskUnderEditChange}
+                onSaveTaskUnderEdit={props.onSaveTaskUnderEdit}
+                taskUnderEdit={props.taskUnderEdit}
+                saving={props.saving} />
+    </div>
+  </div>
+) : null;
+
+export default connect((state) => state.taskManagement)(EditTask);
+```
+Oh. Deze lijkt verdacht veel op NewTask! Zoek de 3 verschillen. Dit soort redundantie _kun_ natuurlijk ook wegwerken, maar de kosten- / batenanalyse is dan natuurlijk: hoe zelfdocumenterend is de code dan nog?
+
+Eigenlijk bepaalt het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` of het een nieuwe is of dat hij bewerkt wordt... Dat betekent dat je de 3 componenten EditTask, NewTask en TaskForm prima terug kunt brengen naar 1. Zoals je zometeen gaat ziet bepaalt de ```saveTaskUnderEdit()``` wel of er een create (POST) of een update (PUT) plaatsvindt. Het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` kan net zo goed bepalen of er 'Taak bewerken' staat of 'Nieuwe taak aanmaken'... Mocht je deze refactor zelf willen doen, zou ik dat aan het eind van dit lesje doen; we zijn nu eigenlijk bezig met routing en hoe een route de _state_ van je app bepaalt via ```redux```.
+
+Voor nu voeg je dus gewoon EditTask als extra component toe.
+src/index.js
+```javascript
+// (...) bestaande code
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.3">Takenbeheer</Header>
+        <Messages onRemoveMessage={onRemoveMessage} />
+        <NewTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <EditTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <TaskOverview onPressPlay={onPressPlay} />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
+```
+
+## Implementatie van de navigatie
