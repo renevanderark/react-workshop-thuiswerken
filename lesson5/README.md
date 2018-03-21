@@ -18,7 +18,7 @@ Een 'change'-event op de taakbalk (op de URL dus) is wat mij betreft gewoon een 
 Wat moeten we dus kunnen?
 1. Luisteren naar veranderingen in de URL (via de history API)
 2. De dispatcher aanroepen met de juiste Action
-3. Navigatie mogelijk maken via de URL zonder dat de pagina steeds opnieuw wordt aangeroepen ook via de juiste Action
+3. Navigatie mogelijk maken via de URL zonder dat de pagina steeds opnieuw wordt herladen - ook via de juiste Action
 
 LET OP: wil dit werken heb je wel een rewrite rule nodig. Dit kun je doen in een apache ```.htaccess``` file constructie, maar hij zit al correct in ```je-backend```.
 
