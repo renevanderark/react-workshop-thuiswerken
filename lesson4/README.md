@@ -448,7 +448,7 @@ class TaskOverview extends React.Component {
     const { pending, tasks } = this.props;
 
     const tableBody = pending
-      ? (<td colSpan="5">Bezig met laden...</td>)
+    ? (<tr><td colSpan="5">Bezig met laden...</td></tr>)
       : tasks
           .sort((a, b) => b.timeStamp - a.timeStamp)
           .map(task => <Task key={task.id} {...task} />);
