@@ -70,4 +70,8 @@ setInterval(() => {
 
 app.use('/', express.static(process.env.STATIC_DIR));
 
+app.get('*', function(request, response, next) {
+  response.sendFile(process.env.STATIC_DIR + 'index.html');
+});
+
 app.listen(3000, () => console.log("app on port 3000"));
