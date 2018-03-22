@@ -72,6 +72,16 @@ app.put('/tasks/:id/start', (req, res) => {
 
 app.ws('/tasks', (ws, req) => { });
 
+app.get('/tasks/:id', (req, res) => {
+	const taskIdx = tasks.map(t => t.id).indexOf(req.params.id);
+	if (taskIdx < 0) {
+		res.status(404).send({message: `Taak met id ${req.params.id} niet gevonden`});
+	} else {
+		res.send(JSON.stringify(tasks[taskIdx]));
+	}
+});
+
+
 setInterval(() => {
 	if (tasks.filter(t => t.status !== 'wachtrij').length > 0) {
 		tasks = tasks.map(task => (task.status === 'wachtrij'
