@@ -514,7 +514,7 @@ Nu is het plaatje compleet. Je kunt via een 'virtuele hyperlink' navigeren naar 
 
 ## Zelf doen: refactor
 
-We hebben de nodige gaten laten liggen waar wel wat aan zou kunnen doen, zowel functioneel als wat betreft code organisatie:
+We hebben de nodige gaten laten liggen waar je wel wat aan zou kunnen doen, zowel functioneel als wat betreft code organisatie:
 - De EditTask en NewTask componenten zijn redundant, je zou ook kunnen werken met TaskForm direct
 - Een taak die niet de status wachtrij heeft (maar aan het draaien is) kan gewoon nog bewerkt worden, maar dit is niet zo netjes.
 - taskName en contactEmail worden niet gevalideerd bij RECEIVE_TASK_UNDER_EDIT
