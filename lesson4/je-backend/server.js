@@ -6,10 +6,10 @@ const expressWs = require('express-ws')(app);
 let tasks = [
 	{
 		contactEmail: "voorgeladen@bk.ln",
-    taskName: "deze zat al in de server",
-    id: `${Math.random() * new Date().getTime()}`,
-    timeStamp: new Date().getTime(),
-    status: "wachtrij"
+		taskName: "deze zat al in de server",
+		id: `${Math.random() * new Date().getTime()}`,
+		timeStamp: new Date().getTime(),
+		status: "wachtrij"
 	}
 ];
 
@@ -36,7 +36,23 @@ app.post('/tasks', (req, res) => {
 			expressWs.getWss().clients.forEach(client => client.send(JSON.stringify(tasks)));
 		}, 1000);
 	}
+});
 
+app.put('/tasks/:id', (req, res) => {
+	const upIdx = tasks.map(t => t.id).indexOf(req.params.id);
+	if (upIdx < 0) {
+		res.status(404).send({message: `Taak met id ${req.params.id} niet gevonden`});
+	} else {
+		const updatedTask = Object.assign(tasks[upIdx], {
+			contactEmail: req.body.contactEmail,
+			taskName: req.body.taskName,
+		});
+		tasks[upIdx] = updatedTask;
+		setTimeout(() => {
+			res.send(JSON.stringify(updatedTask));
+			expressWs.getWss().clients.forEach(client => client.send(JSON.stringify(tasks)));
+		}, 1000);
+	}
 });
 
 app.get('/tasks', (req, res) => {
