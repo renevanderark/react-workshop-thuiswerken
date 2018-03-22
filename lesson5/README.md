@@ -212,6 +212,14 @@ En laten we onze top-level componenten deze 'data-verzoeken' laten respecteren.
 
 components/TaskOverview.js
 ```javascript
+// (...) bestaande code
+class TaskOverview extends React.Component {
+
+  render() {
+    if (!this.props.isVisible) { return null; } // dit is nieuw
+
+    const { pending, tasks, onPressPlay, navigateTo } = this.props;
+// (...) bestaande code
 ```
 
 components/NewTask.js
