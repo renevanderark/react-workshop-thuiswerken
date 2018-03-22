@@ -239,18 +239,6 @@ const NewTask = (props) => props.showEdit ? null : ( // dit is nieuw
 // (...) bestaande code
 ```
 
-components/TaskOverview.js
-```javascript
-// (...) bestaande code
-class TaskOverview extends React.Component {
-
-  render() {
-    if (!this.props.isVisible) { return null; }
-    // (...) bestaande code
-  }
-}
-// (...) bestaande code
-```
 
 Had ik al verteld dat een react ```render()``` ook ```null``` mag teruggeven voor render niks?
 
