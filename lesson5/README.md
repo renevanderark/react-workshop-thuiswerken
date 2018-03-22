@@ -265,7 +265,7 @@ export default connect((state) => state.taskManagement)(EditTask);
 ```
 Oh. Deze lijkt verdacht veel op NewTask! Zoek de 3 verschillen. Dit soort redundantie _kun_ natuurlijk ook wegwerken, maar de kosten- / batenanalyse is dan natuurlijk: hoe zelfdocumenterend is de code dan nog?
 
-Eigenlijk bepaalt het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` of het een nieuwe is of dat hij bewerkt wordt... Dat betekent dat je de 3 componenten EditTask, NewTask en TaskForm prima terug kunt brengen naar 1. Zoals je zometeen gaat ziet bepaalt de ```saveTaskUnderEdit()``` wel of er een create (POST) of een update (PUT) plaatsvindt. Het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` kan net zo goed bepalen of er 'Taak bewerken' staat of 'Nieuwe taak aanmaken'... Mocht je deze refactor zelf willen doen, zou ik dat aan het eind van dit lesje doen; we zijn nu eigenlijk bezig met routing en hoe een route de _state_ van je app bepaalt via ```redux```.
+Eigenlijk bepaalt het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` of het een nieuwe is of dat hij bewerkt wordt... Dat betekent dat je de 3 componenten EditTask, NewTask en TaskForm prima terug kunt brengen naar 1. Zoals je zometeen gaat zien bepaalt de ```saveTaskUnderEdit()``` wel of er een create (POST) of een update (PUT) plaatsvindt. Het al dan niet bestaan van een ```id``` voor ```taskUnderEdit``` kan net zo goed bepalen of er 'Taak bewerken' staat of 'Nieuwe taak aanmaken'... Mocht je deze refactor zelf willen doen, zou ik dat aan het eind van dit lesje doen; we zijn nu eigenlijk bezig met routing en hoe een route de _state_ van je app bepaalt via ```redux```.
 
 Voor nu voeg je dus gewoon EditTask als extra component toe.
 src/index.js
@@ -395,7 +395,7 @@ switch (action.type) {
 			...state,
 			taskUnderEdit: {
 				id: action.payload.id,
-				// eigen zou een validator in de action _isValid_ nog moeten bepalen,
+				// eigenlijk zou een validator in de action _isValid_ nog moeten bepalen,
 				// of validatie zou hier in de reducer moeten plaatsvinden.
 				contactEmail: {value: action.payload.contactEmail, isValid: true},
 				taskName: {value: action.payload.taskName, isValid: true}
@@ -488,7 +488,7 @@ components/task-overview/TaskOverview.js
       ? (<tr><td colSpan="5">Bezig met laden...</td></tr>)
       : tasks
           .sort((a, b) => b.timeStamp - a.timeStamp)
-          .map(task => <Task key={task.id} {...task} navigateTo={navigateTo} nPressPlay={() => onPressPlay(task.id)} />);
+          .map(task => <Task key={task.id} {...task} navigateTo={navigateTo} onPressPlay={() => onPressPlay(task.id)} />);
 
 // (...) bestaande code
 ```
@@ -517,4 +517,5 @@ Nu is het plaatje compleet. Je kunt via een 'virtuele hyperlink' navigeren naar 
 We hebben de nodige gaten laten liggen waar wel wat aan zou kunnen doen, zowel functioneel als wat betreft code organisatie:
 - De EditTask en NewTask componenten zijn redundant, je zou ook kunnen werken met TaskForm direct
 - Een taak die niet de status wachtrij heeft (maar aan het draaien is) kan gewoon nog bewerkt worden, maar dit is niet zo netjes.
+- taskName en contactEmail worden niet gevalideerd bij RECEIVE_TASK_UNDER_EDIT
 - De file ```actions.js``` staat propvol met private functies; zo kunnen we ze niet geïsoleerd testen (zonder eerst de actionCreator aan te roepen). Ze zouden per aard van 'action' in een subdir ```actions``` kunnen.
