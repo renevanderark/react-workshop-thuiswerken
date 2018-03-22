@@ -518,4 +518,4 @@ We hebben de nodige gaten laten liggen waar je wel wat aan zou kunnen doen, zowe
 - De EditTask en NewTask componenten zijn redundant, je zou ook kunnen werken met TaskForm direct
 - Een taak die niet de status wachtrij heeft (maar aan het draaien is) kan gewoon nog bewerkt worden, maar dit is niet zo netjes.
 - taskName en contactEmail worden niet gevalideerd bij RECEIVE_TASK_UNDER_EDIT
-- De file ```actions.js``` staat propvol met private functies; zo kunnen we ze niet geïsoleerd testen (zonder eerst de actionCreator aan te roepen). Ze zouden per aard van 'action' in een subdir ```actions``` kunnen.
+- De file ```actions.js``` staat propvol met private functies; zo kunnen we ze niet geïsoleerd testen (zonder eerst de actionCreator aan te roepen). Ze zouden als lose modules uit een subdir ```actions``` kunnen worden geïmporteerd.
