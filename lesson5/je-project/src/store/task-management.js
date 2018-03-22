@@ -15,6 +15,26 @@ export default function(state, action) {
     return initialState;
   }
   switch (action.type) {
+    case ActionTypes.SHOW_EDIT:
+      return {
+        ...state,
+        showEdit: true
+      };
+    case ActionTypes.SHOW_MAIN:
+      return {
+        ...state,
+        taskUnderEdit: initialState.taskUnderEdit,
+        showEdit: false
+      };
+    case ActionTypes.RECEIVE_TASK_UNDER_EDIT:
+      return {
+        ...state,
+        taskUnderEdit: {
+          id: action.payload.id,
+          contactEmail: {value: action.payload.contactEmail, isValid: true},
+          taskName: {value: action.payload.taskName, isValid: true}
+        }
+      };
     case ActionTypes.SAVING_TASK_UNDER_EDIT:
       return {
         ...state,

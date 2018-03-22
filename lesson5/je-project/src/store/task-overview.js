@@ -11,6 +11,16 @@ export default function(state, action) {
     return initialState;
   }
   switch (action.type) {
+    case ActionTypes.SHOW_EDIT:
+      return {
+        ...state,
+        isVisible: false
+      };
+    case ActionTypes.SHOW_MAIN:
+      return {
+        ...state,
+        isVisible: true
+      };
     case ActionTypes.REQUEST_TASKS:
       return {
         ...state,

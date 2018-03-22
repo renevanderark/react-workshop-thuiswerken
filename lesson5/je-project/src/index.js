@@ -32,12 +32,13 @@ const {
   onSaveTaskUnderEdit,
   onFetchTasks,
   onRemoveMessage,
-  onPressPlay
+  onPressPlay,
+  onShowEdit
 } = actionCreator(store.dispatch, navigateTo);
 
 mapRoutes({
-  '/': (params) => console.log(params),
-  '/:taskId/edit': (params) => console.log(params)
+  '/': (params) => store.dispatch({type: ActionTypes.SHOW_MAIN}),
+  '/:taskId/edit': (params) => onShowEdit(params.taskId)
 });
 
 onFetchTasks(); // haal eerste keer takenlijst op via xhr actionCreator
@@ -60,7 +61,7 @@ window.addEventListener("DOMContentLoaded", () =>
                 onTaskUnderEditChange={onTaskUnderEditChange} />
         <EditTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
                 onTaskUnderEditChange={onTaskUnderEditChange} />
-        <TaskOverview onPressPlay={onPressPlay} />
+        <TaskOverview navigateTo={navigateTo} onPressPlay={onPressPlay} />
       </App>
     </Provider>
   ),  document.getElementById("app"))

@@ -8,13 +8,13 @@ class TaskOverview extends React.Component {
   render() {
     if (!this.props.isVisible) { return null; }
 
-    const { pending, tasks, onPressPlay } = this.props;
+    const { pending, tasks, onPressPlay, navigateTo } = this.props;
 
     const tableBody = pending
       ? (<tr><td colSpan="5">Bezig met laden...</td></tr>)
       : tasks
           .sort((a, b) => b.timeStamp - a.timeStamp)
-          .map(task => <Task key={task.id} {...task} onPressPlay={() => onPressPlay(task.id)} />);
+          .map(task => <Task key={task.id} {...task} navigateTo={navigateTo} onPressPlay={() => onPressPlay(task.id)} />);
 
     return (
       <div className="card">

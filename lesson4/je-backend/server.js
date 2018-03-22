@@ -37,6 +37,16 @@ app.post('/tasks', (req, res) => {
 		}, 1000);
 	}
 });
+app.put('/tasks/:id/start', (req, res) => {
+	const upIdx = tasks.map(t => t.id).indexOf(req.params.id);
+
+	if (upIdx < 0) {
+		res.status(404).send({message: `Taak met id ${req.params.id} niet gevonden`});
+	} else {
+		tasks[upIdx].status = "0%";
+		res.send({});
+	}
+});
 
 app.put('/tasks/:id', (req, res) => {
 	const upIdx = tasks.map(t => t.id).indexOf(req.params.id);
@@ -59,16 +69,7 @@ app.get('/tasks', (req, res) => {
 	setTimeout(() =>	res.send(JSON.stringify(tasks)), 1500);
 });
 
-app.put('/tasks/:id/start', (req, res) => {
-	const upIdx = tasks.map(t => t.id).indexOf(req.params.id);
 
-	if (upIdx < 0) {
-		res.status(404).send({message: `Taak met id ${req.params.id} niet gevonden`});
-	} else {
-		tasks[upIdx].status = "0%";
-		res.send({});
-	}
-});
 
 app.ws('/tasks', (ws, req) => { });
 

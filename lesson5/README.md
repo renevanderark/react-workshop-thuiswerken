@@ -293,3 +293,232 @@ window.addEventListener("DOMContentLoaded", () =>
 ```
 
 ## Implementatie van de navigatie
+
+Nu gaan we de SHOW_EDIT en SHOW_MAIN action types implementeren. Omdat we echter ook nog de te bewerken taak van de server moeten ophalen hebben we waarschijnlijk meer action types nodig.
+
+action-types.js
+```javascript
+// (...) bestaande code
+	RECEIVE_TASK_UNDER_EDIT: "RECEIVE_TASK_UNDER_EDIT"
+}
+```
+
+actions.js
+```javascript
+// (...) bestaande code
+const fetchTaskUnderEdit = (taskId, navigateTo) => (dispatch) => {
+  dispatch({type: ActionTypes.SHOW_EDIT});
+  xhr({
+    url: `/tasks/${taskId}`,
+    method: "GET",
+    headers: { "Accept": "application/json" }
+  }, (error, response, body) => {
+    if (error != null) {
+      dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: "Fout met ophalen taak" });
+      navigateTo("/");
+    } else if (response.statusCode < 200 || response.statusCode >= 400) {
+      dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: `${response.statusCode} - ${JSON.parse(body).message}` });
+      navigateTo("/");
+    } else {
+      dispatch({type: ActionTypes.RECEIVE_TASK_UNDER_EDIT, payload: JSON.parse(body)})
+    }
+  });
+}
+
+// de action creator:
+export default function(dispatch, navigateTo) {
+  return {
+    onTaskUnderEditChange: (newValues) => dispatch(updateTaskUnderEdit(newValues)),
+    onSaveTaskUnderEdit: () => dispatch(saveTaskUnderEdit()),
+    onFetchTasks: () => dispatch(fetchTasks()),
+    onRemoveMessage: (messageIndex) => dispatch({type: ActionTypes.ON_REMOVE_MESSAGE, messageIndex: messageIndex}),
+    onPressPlay: (taskId) => dispatch(pressPlay(taskId)),
+    onShowEdit: (taskId) => dispatch(fetchTaskUnderEdit(taskId, navigateTo))
+  };
+}
+```
+
+Je ziet nu de ```navigateTo``` als extra parameter. Die wordt gebruikt om naar ```/``` te navigeren wanneer de taak niet is gevonden op de server (_virtuele_ redirect).
+
+Pas maar alvast de index.js aan:
+```javascript
+// (...) bestaande code
+const {
+  onTaskUnderEditChange,
+  onSaveTaskUnderEdit,
+  onFetchTasks,
+  onRemoveMessage,
+  onPressPlay,
+  onShowEdit
+} = actionCreator(store.dispatch, navigateTo);
+
+mapRoutes({
+  '/': (params) => store.dispatch({type: ActionTypes.SHOW_MAIN}),
+  '/:taskId/edit': (params) => onShowEdit(params.taskId)
+});
+// (...) bestaande code
+```
+
+Wat nu nog nodig is dat de reducers hun data gaan verwerken.
+
+store/task-overview.js
+```javascript
+// (...) bestaande code
+  switch (action.type) {
+    case ActionTypes.SHOW_EDIT:
+      return {
+        ...state,
+        isVisible: false
+      };
+    case ActionTypes.SHOW_MAIN:
+      return {
+        ...state,
+        isVisible: true
+      };
+// (...) bestaande code
+```
+
+
+store/task-management.js
+```javascript
+// (...) bestaande code
+switch (action.type) {
+	case ActionTypes.SHOW_EDIT:
+		return {
+			...state,
+			showEdit: true
+		};
+	case ActionTypes.SHOW_MAIN:
+    return {
+      ...state,
+      taskUnderEdit: initialState.taskUnderEdit,
+      showEdit: false
+    };
+	case ActionTypes.RECEIVE_TASK_UNDER_EDIT:
+		return {
+			...state,
+			taskUnderEdit: {
+				id: action.payload.id,
+				// eigen zou een validator in de action _isValid_ nog moeten bepalen,
+				// of validatie zou hier in de reducer moeten plaatsvinden.
+				contactEmail: {value: action.payload.contactEmail, isValid: true},
+				taskName: {value: action.payload.taskName, isValid: true}
+			}
+		};
+// (...) bestaande code
+```
+Als je nu de url ```/[bestaand-task-id]/edit``` bezoekt wordt het formulier correct gevuld en getoond.
+
+De url zorgt er voor dat SHOW_EDIT wordt aangeroepen door de ```onShowEdit()``` action, alsmede het xhr request en RECEIVE_TASK_UNDER_EDIT.
+
+Maar als je opslaat met Ok, dan gebeurt er dit:
+1. Er wordt nog steeds een nieuwe taak aangemaakt
+2. Je navigeert niet terug naar "/"
+
+Dat moet nog aangepast worden in ```saveTaskUnderEdit```.
+
+actions.js
+```javascript
+// (...) bestaande code
+const saveTaskUnderEdit = (navigateTo) => (dispatch, getState) => { // dit is nieuw
+  const taskUnderEdit = getState().taskManagement.taskUnderEdit;
+  if (taskUnderEdit.contactEmail.isValid && taskUnderEdit.taskName.isValid) {
+    dispatch({type: ActionTypes.SAVING_TASK_UNDER_EDIT});
+    xhr({
+      url: taskUnderEdit.id === null ? "/tasks" : `/tasks/${taskUnderEdit.id}`, // dit is nieuw
+      method: taskUnderEdit.id === null ? "POST" : "PUT", // dit is nieuw
+      headers: { "Accept": "application/json", "Content-type": "application/json" },
+      data: JSON.stringify({
+        contactEmail: taskUnderEdit.contactEmail.value,
+        taskName: taskUnderEdit.taskName.value
+      })
+    }, (error, response, body) => {
+      dispatch({type: ActionTypes.TASK_UNDER_EDIT_SAVED });
+      navigateTo("/"); // dit is nieuw
+      if (error != null) {
+        dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: "Fout bij het opslaan" });
+      } else if (response.statusCode < 200 || response.statusCode >= 400) {
+        dispatch({type: ActionTypes.ON_ERROR_MESSAGE, payload: `${response.statusCode} - ${JSON.parse(body).message}` });
+      }
+    });
+  }
+};
+// (...) bestaande code
+// de action creator:
+export default function(dispatch, navigateTo) {
+  return {
+    onTaskUnderEditChange: (newValues) => dispatch(updateTaskUnderEdit(newValues)),
+    onSaveTaskUnderEdit: () => dispatch(saveTaskUnderEdit(navigateTo)), // dit is nieuw
+    onFetchTasks: () => dispatch(fetchTasks()),
+    onRemoveMessage: (messageIndex) => dispatch({type: ActionTypes.ON_REMOVE_MESSAGE, messageIndex: messageIndex}),
+    onPressPlay: (taskId) => dispatch(pressPlay(taskId)),
+    onShowEdit: (taskId) => dispatch(fetchTaskUnderEdit(taskId, navigateTo))
+  };
+}
+```
+
+Als je nu opslaat wordt er niet een ```POST``` gedaan naar ```/tasks```, maar een ```PUT``` naar ```/tasks/:taskId```, waar ```je-backend``` de update uitvoert.
+
+Wat er nu nog ontbreekt is een 'hyperlink' naar het edit formulier. Dit bootsen we na met gebruikmaking van de ```navigateTo``` functie die we doorgeven via de props van het TaskOverview component.
+
+index.js
+```javascript
+// (...) bestaande code
+window.addEventListener("DOMContentLoaded", () =>
+  ReactDOM.render((
+    <Provider store={store}>
+      <App>
+        <Header versie="0.0.3">Takenbeheer</Header>
+        <Messages onRemoveMessage={onRemoveMessage} />
+        <NewTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <EditTask onSaveTaskUnderEdit={onSaveTaskUnderEdit}
+                onTaskUnderEditChange={onTaskUnderEditChange} />
+        <TaskOverview navigateTo={navigateTo} onPressPlay={onPressPlay} />
+      </App>
+    </Provider>
+  ),  document.getElementById("app"))
+);
+```
+
+components/task-overview/TaskOverview.js
+```javascript
+// (...) bestaande code
+
+
+    const { pending, tasks, onPressPlay, navigateTo } = this.props;
+
+    const tableBody = pending
+      ? (<tr><td colSpan="5">Bezig met laden...</td></tr>)
+      : tasks
+          .sort((a, b) => b.timeStamp - a.timeStamp)
+          .map(task => <Task key={task.id} {...task} navigateTo={navigateTo} nPressPlay={() => onPressPlay(task.id)} />);
+
+// (...) bestaande code
+```
+
+components/task-overview/Task.js
+```javascript
+// (...) bestaande code
+const Task = ({ id, taskName, contactEmail, timeStamp, status, onPressPlay, navigateTo }) => (
+  <tr>
+    <td><button disabled={status !== 'wachtrij'} className="btn btn-sm" onClick={onPressPlay}>►</button></td>
+    <td>
+      <a style={{color: "blue", cursor: "pointer"}} onClick={() => navigateTo(`/${id}/edit`)}>{taskName}</a>
+    </td>
+    <td>{status}</td>
+    <td>{contactEmail}</td>
+    <td>{dateFmt(new Date(timeStamp))}</td>
+  </tr>
+);
+// (...) bestaande code
+```
+
+Nu is het plaatje compleet. Je kunt via een 'virtuele hyperlink' navigeren naar het bewerken van een taak. En, als je de back- en foward-knop van de browser gebruikt worden de juiste Actions getriggert. De URL is de baas van ```redux``` en ```redux``` is de baas van je application state.
+
+## Zelf doen: refactor
+
+We hebben de nodige gaten laten liggen waar wel wat aan zou kunnen doen, zowel functioneel als wat betreft code organisatie:
+- De EditTask en NewTask componenten zijn redundant, je zou ook kunnen werken met TaskForm direct
+- Een taak die niet de status wachtrij heeft (maar aan het draaien is) kan gewoon nog bewerkt worden, maar dit is niet zo netjes.
+- De file ```actions.js``` staat propvol met private functies; zo kunnen we ze niet geïsoleerd testen (zonder eerst de actionCreator aan te roepen). Ze zouden per aard van 'action' in een subdir ```actions``` kunnen.

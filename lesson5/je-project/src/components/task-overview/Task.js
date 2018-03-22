@@ -13,10 +13,12 @@ const dateFmt = (date) =>
   `${pad(date.getHours(), 2)}:${pad(date.getMinutes(), 2)}:${pad(date.getSeconds(), 2)}.` +
   `${pad(date.getMilliseconds(), 3)}Z`;
 
-const Task = ({ taskName, contactEmail, timeStamp, status, onPressPlay }) => (
+const Task = ({ id, taskName, contactEmail, timeStamp, status, onPressPlay, navigateTo }) => (
   <tr>
     <td><button disabled={status !== 'wachtrij'} className="btn btn-sm" onClick={onPressPlay}>►</button></td>
-    <td>{taskName}</td>
+    <td>
+      <a style={{color: "blue", cursor: "pointer"}} onClick={() => navigateTo(`/${id}/edit`)}>{taskName}</a>
+    </td>
     <td>{status}</td>
     <td>{contactEmail}</td>
     <td>{dateFmt(new Date(timeStamp))}</td>
