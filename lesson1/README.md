@@ -10,7 +10,7 @@ Wat de frontend hipsters gebruiken verandert de hele tijd en ook deze setup is n
 
 ## Node en npm
 
-Omdat ook nodejs en npm voortdurend in ontwikkeling zijn en je niet als root gebruiker voordurend je versies wilt moeten ophogen werken frontend ontwikkelaars vaak met nvm of docker.
+Omdat ook nodejs en npm voortdurend in ontwikkeling zijn en je niet als root gebruiker voordurend je versies wilt moeten ophogen werken frontend ontwikkelaars vaak met [nvm](https://github.com/creationix/nvm) in plaats van system tools als ```apt``` of ```yum```!
 
 Ik kan [nvm](https://github.com/creationix/nvm) van harte aanbevelen. De installatie-instructie alhier is alles wat je nodig hebt om van start te gaan.
 
@@ -107,6 +107,12 @@ main.js
 
 En bouwt je broncode naar ```dist/main.js```. Als je in dit bestandje kijkt zie je al wat minified boilerplate. Wij negeren deze boilerplate voor deze cursus.
 
+
+LET OP: je krijgt nu nog wel de onderstaande melding. Die verdwijnt aan het eind van deze les wanneer we de ```webpack.config.js``` toevoegen.
+```
+WARNING in configuration
+The 'mode' option has not been set. Set 'mode' option to 'development' or 'production' to enable defaults for this environment.
+```
 
 ### Stap 4, single page app!
 
