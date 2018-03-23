@@ -2,7 +2,7 @@
 
 ## Welkom terug.
 
-Ik zou het hier gaan hebben over testen, maar toen ik ging zoeken naar hoe mensen deze _stack_ tegenwoording testte, kwam ik erachter dat de website van ```redux``` alles wat ik je wou leren al vertelt!
+Ik zou het hier gaan hebben over testen, maar toen ik ging zoeken naar hoe mensen deze _stack_ tegenwoording testen, kwam ik erachter dat de website van ```redux``` alles wat ik je wou leren al vertelt!
 
 Dat is ja mooi (zoals ze dat in Groningen zeggen):
 [https://redux.js.org/recipes/writing-tests](https://redux.js.org/recipes/writing-tests)
